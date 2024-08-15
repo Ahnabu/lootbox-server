@@ -45,7 +45,7 @@ The backend of LootBox is built using Express and MongoDB. It provides RESTful A
 ### API Endpoints
 
 - `GET /api/products`: Fetch all products.
-- `GET /api/products?minPrice=&maxPrice=`: Fetch products within a specific price range.
+
 
 
 ### Scripts

@@ -8,8 +8,8 @@ app.use(
     cors({
         origin: [
             "http://localhost:5173",
-
-
+            "https://lootbox-37983.web.app",
+            "https://lootbox-37983.firebaseapp.com"
         ],
         credentials: true,
     })
