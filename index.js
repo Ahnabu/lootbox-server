@@ -46,6 +46,8 @@ async function run() {
             const sorted = req.query.sort;
             const order = req.query.order;
             const filter = req.query.filter;
+            const brand = req.query.brand;
+            const category = req.query.category;
             const minPrice = parseFloat(req.query.minPrice) || 0;
             const maxPrice = parseFloat(req.query.maxPrice) || Number.MAX_SAFE_INTEGER;
             console.log(req.query);
