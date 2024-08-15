@@ -31,6 +31,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
+        const dataCollection = client.db('bkash').collection('data')
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         // Send a ping to confirm a successful connection
@@ -41,32 +42,23 @@ async function run() {
         app.get('/', (req, res) => {
             res.send("running")
         })
-        //post user
-        app.post('/users', async (req, res) => {
-            const newUser = await req.body;
-            const exist = await userCollection.findOne({ phone: newUser.phone });
-            if (exist) {
-                res.send({ message: 'user exist', status: 404 })
-                console.log("exist");
-            } else {
-               
-                const response = userCollection.insertOne(newUser);
-                console.log(response);
-                res.send({ message: 'user created', status: 200 })
-            }
+        app.get('/data', async(req, res) => {
+            const sorted = req.query.sort;
+            const order = req.query.order;
+            const filter = req.query.filter;
 
-        })
-        //get single user data
-        app.get('/users', async (req, res) => {
-         
-        });
-       
+            //search functionality
+            let query = {}
+            if (filter) query = { campName: { $regex: filter, $options: 'i' } }
+            //sort functionality
 
-        //logout api
+            let sortOrder = {}
+            if (sorted) sortOrder = { [sorted]: order === 'asc' ? 1 : -1 }
+            const result = await campCollection.find(query).sort(sortOrder).toArray()
 
-        app.get('/logout', (req, res) => {
-           
-        });
+            res.send(result)
+       })
+      
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close(); 
