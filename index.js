@@ -46,16 +46,20 @@ async function run() {
             const sorted = req.query.sort;
             const order = req.query.order;
             const filter = req.query.filter;
-
+            const minPrice = parseFloat(req.query.minPrice) || 0;
+            const maxPrice = parseFloat(req.query.maxPrice) || Number.MAX_SAFE_INTEGER;
+            console.log(req.query);
             //search functionality
             let query = {}
-            if (filter) query = { campName: { $regex: filter, $options: 'i' } }
+            if (filter || minPrice || maxPrice) query = {
+                productName: { $regex: filter, $options: 'i' }, price: { $gte: minPrice, $lte: maxPrice }
+}
             //sort functionality
 
             let sortOrder = {}
             if (sorted) sortOrder = { [sorted]: order === 'asc' ? 1 : -1 }
-            const result = await campCollection.find(query).sort(sortOrder).toArray()
-
+            const result = await dataCollection.find(query).sort(sortOrder).toArray()
+            console.log("data passes");
             res.send(result)
        })
       
