@@ -68,7 +68,7 @@ async function run() {
 
             let sortOrder = {}
             if (sorted) sortOrder = { [sorted]: order === 'asc' ? 1 : -1 }
-            const result = await dataCollection.find(query).sort(sortOrder).toArray()
+            const result = await dataCollection.find(query).sort(sortOrder).skip(9 * page).limit(9).toArray()
             console.log("data passes");
             res.send(result)
        })
