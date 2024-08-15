@@ -42,6 +42,10 @@ async function run() {
         app.get('/', (req, res) => {
             res.send("running")
         })
+        app.get('/data-count', async (req, res) => {
+            const count = await dataCollection.estimatedDocumentCount()
+            res.send({ count });
+        })
         app.get('/data', async(req, res) => {
             const sorted = req.query.sort;
             const order = req.query.order;
