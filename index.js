@@ -53,8 +53,11 @@ async function run() {
             console.log(req.query);
             //search functionality
             let query = {}
-            if (filter || minPrice || maxPrice) query = {
-                productName: { $regex: filter, $options: 'i' }, price: { $gte: minPrice, $lte: maxPrice }
+            if (filter || minPrice || maxPrice || brand || category) query = {
+                productName: { $regex: filter, $options: 'i' },
+                brandName: { $regex: brand, $options: 'i' },
+                category: { $regex: category, $options: 'i' },
+                price: { $gte: minPrice, $lte: maxPrice }
 }
             //sort functionality
 
