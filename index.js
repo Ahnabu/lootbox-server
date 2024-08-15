@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors')
-const jwt = require('jsonwebtoken');
+
 require('dotenv').config();
 const app = express()
 app.use(express.json())
@@ -33,7 +33,7 @@ async function run() {
     try {
         const dataCollection = client.db('bkash').collection('data')
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -46,12 +46,12 @@ async function run() {
             const count = await dataCollection.estimatedDocumentCount()
             res.send({ count });
         })
-        app.get('/data', async(req, res) => {
-            const sorted = req.query.sort;
-            const order = req.query.order;
-            const filter = req.query.filter;
-            const brand = req.query.brand;
-            const category = req.query.category;
+        app.get('/data', async (req, res) => {
+            const sorted = req.query.sort || '';
+            const order = req.query.order || '';
+            const filter = req.query.filter || '';
+            const brand = req.query.brand || '';
+            const category = req.query.category || '';
             let page = parseFloat(req.query.currentPage || 0)
             const minPrice = parseFloat(req.query.minPrice) || 0;
             const maxPrice = parseFloat(req.query.maxPrice) || Number.MAX_SAFE_INTEGER;
@@ -63,17 +63,20 @@ async function run() {
                 brandName: { $regex: brand, $options: 'i' },
                 category: { $regex: category, $options: 'i' },
                 price: { $gte: minPrice, $lte: maxPrice }
-}
+            }
             //sort functionality
 
             let sortOrder = {}
             if (sorted) sortOrder = { [sorted]: order === 'asc' ? 1 : -1 }
             const result = await dataCollection.find(query).sort(sortOrder).skip(9 * page).limit(9).toArray()
-            console.log("data passes");
+        
             res.send(result)
-       })
-      
-    } finally {
+        })
+
+    } catch {
+        console.log(error);
+    }
+    finally {
         // Ensures that the client will close when you finish/error
         // await client.close(); 
     }
