@@ -52,6 +52,7 @@ async function run() {
             const filter = req.query.filter;
             const brand = req.query.brand;
             const category = req.query.category;
+            let page = parseFloat(req.query.currentPage || 0)
             const minPrice = parseFloat(req.query.minPrice) || 0;
             const maxPrice = parseFloat(req.query.maxPrice) || Number.MAX_SAFE_INTEGER;
             console.log(req.query);
