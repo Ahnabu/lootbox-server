@@ -37,39 +37,48 @@ async function run() {
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
-
+ 
         const userCollection = client.db('bkash').collection('users')
         app.get('/', (req, res) => {
             res.send("running")
         })
         app.get('/data-count', async (req, res) => {
-            const count = await dataCollection.estimatedDocumentCount()
+            const sorted = req.query.sort;
+            const order = req.query.order;
+            const filter = req.query.filter;
+            const brand = req.query.brand;
+            const category = req.query.category;
+            
+            const minPrice = parseFloat(req.query.minPrice) || 0;
+            const maxPrice = parseFloat(req.query.maxPrice) || Number.MAX_SAFE_INTEGER;
+            let query = {}
+            if (filter || minPrice || maxPrice || brand || category) query = {
+                productName: { $regex: filter, $options: 'i' }, brandName: { $regex: brand, $options: 'i' }, category: { $regex: category, $options: 'i' }, price: { $gte: minPrice, $lte: maxPrice }
+            }
+            const count = await dataCollection.estimatedDocumentCount(query)
             res.send({ count });
         })
         app.get('/data', async (req, res) => {
-            const sorted = req.query.sort || '';
-            const order = req.query.order || '';
-            const filter = req.query.filter || '';
-            const brand = req.query.brand || '';
-            const category = req.query.category || '';
-            let page = parseFloat(req.query.currentPage || 0)
+            const sorted = req.query.sort;
+            const order = req.query.order;
+            const filter = req.query.filter;
+            const brand = req.query.brand;
+            const category = req.query.category;
+            let page = parseFloat(req.query.currentPage-1 || 0)
             const minPrice = parseFloat(req.query.minPrice) || 0;
             const maxPrice = parseFloat(req.query.maxPrice) || Number.MAX_SAFE_INTEGER;
             console.log(req.query);
             //search functionality
             let query = {}
             if (filter || minPrice || maxPrice || brand || category) query = {
-                productName: { $regex: filter, $options: 'i' },
-                brandName: { $regex: brand, $options: 'i' },
-                category: { $regex: category, $options: 'i' },
-                price: { $gte: minPrice, $lte: maxPrice }
+                productName: { $regex: filter, $options: 'i' },brandName: { $regex: brand, $options: 'i' },category: { $regex: category, $options: 'i' },price: { $gte: minPrice, $lte: maxPrice }
             }
             //sort functionality
 
             let sortOrder = {}
             if (sorted) sortOrder = { [sorted]: order === 'asc' ? 1 : -1 }
-            const result = await dataCollection.find(query).sort(sortOrder).skip(9 * page).limit(9).toArray()
-        
+            const result = await dataCollection.find(query).sort(sortOrder).skip(9 * page).limit(9).toArray();
+            console.log(result);
             res.send(result)
         })
 
