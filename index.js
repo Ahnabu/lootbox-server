@@ -43,8 +43,6 @@ async function run() {
             res.send("running")
         })
         app.get('/data-count', async (req, res) => {
-            const sorted = req.query.sort;
-            const order = req.query.order;
             const filter = req.query.filter;
             const brand = req.query.brand;
             const category = req.query.category;
@@ -55,7 +53,8 @@ async function run() {
             if (filter || minPrice || maxPrice || brand || category) query = {
                 productName: { $regex: filter, $options: 'i' }, brandName: { $regex: brand, $options: 'i' }, category: { $regex: category, $options: 'i' }, price: { $gte: minPrice, $lte: maxPrice }
             }
-            const count = await dataCollection.estimatedDocumentCount(query)
+            const count = await dataCollection.countDocuments(query)
+         
             res.send({ count });
         })
         app.get('/data', async (req, res) => {
@@ -67,7 +66,7 @@ async function run() {
             let page = parseFloat(req.query.currentPage-1 || 0)
             const minPrice = parseFloat(req.query.minPrice) || 0;
             const maxPrice = parseFloat(req.query.maxPrice) || Number.MAX_SAFE_INTEGER;
-            console.log(req.query);
+            
             //search functionality
             let query = {}
             if (filter || minPrice || maxPrice || brand || category) query = {
@@ -78,7 +77,7 @@ async function run() {
             let sortOrder = {}
             if (sorted) sortOrder = { [sorted]: order === 'asc' ? 1 : -1 }
             const result = await dataCollection.find(query).sort(sortOrder).skip(9 * page).limit(9).toArray();
-            console.log(result);
+            // console.log(result);
             res.send(result)
         })
 
